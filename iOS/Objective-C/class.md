@@ -224,7 +224,7 @@ _objc_rootInit(id obj)
 
 init 方法只是返回了当前对象。init 方式的设计相当于一种工厂模式，在子类重写该方法，进行如一些变量初始化赋值。
 
-## 对象本质
+## 对象的结构
 
 打开终端，cd 进入 main.m 文件所在路径，使用 clang 把文件编译成 cpp 文件。
 
@@ -242,17 +242,19 @@ typedef struct {} _objc_exc_Person;
 #endif
 
 struct Person_IMPL {
-	struct NSObject_IMPL NSObject_IVARS;
+    struct NSObject_IMPL NSObject_IVARS;
     NSString *name;
-	int age;
+    int age;
 };
 
 struct NSObject_IMPL {
-	Class isa;
+    Class isa;
 };
 ```
 
 可以看到，Person 对象本质都是一个 objc_object 的结构体，Person_IMPL 里面有 NSObject_IMPL 和成员变量的值，NSObject_IMPL 包含了一个 Class 类型的 isa 指针。
+
+对象里面存储了一个isa指针 + 成员变量的值，isa指针是固定的，占8个字节，所以影响对象内存的只有成员变量（属性会自动生成带下划线的成员变量）。
 
 ### isa 结构
 
@@ -299,3 +301,89 @@ public:
     Class getDecodedClass(bool authenticated);
 }
 ```
+
+可以看到 isa 本质是一个8字节联合体，而且使用了位域优化内存分配，里面存放了类对象的指针。nonPointerIsa是内存优化的一种手段。isa是一个Class类型的结构体指针，占8个字节，主要是用 来存内存地址的。但是8个字节意味着它就有8*8=64位。存储地址根本不需要这么多的内存空间。而且每个对象都有个isa指针，这样就浪费了内存。所以苹果就把和对象一些息息相关的东⻄，存在了这块内存空间里面。这种isa指针就叫nonPointerIsa。
+
+## 类的结构
+
+```objc
+typedef struct objc_class *Class;
+
+struct objc_class : objc_object {
+    // Class ISA;
+    Class superclass;
+    cache_t cache;             // formerly cache pointer and vtable
+    class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
+};
+
+struct class_data_bits_t {
+
+    // ...省略
+public:
+    class_rw_t* data() {
+        return (class_rw_t *)(bits & FAST_DATA_MASK);
+    }
+    // ...省略
+}
+
+struct class_rw_t {
+    uint32_t flags;
+    uint32_t version;
+
+    const class_ro_t *ro;
+    // ...省略
+}
+
+struct class_ro_t {
+    uint32_t flags;
+    uint32_t instanceStart;
+    uint32_t instanceSize;
+#ifdef __LP64__
+    uint32_t reserved;
+#endif
+
+    const uint8_t * ivarLayout;
+    
+    const char * name;
+    const method_list_t * baseMethods;
+    const protocol_list_t * baseProtocols;
+    const ivar_list_t * ivars;
+
+    const uint8_t * weakIvarLayout;
+    const property_list_t *baseProperties;
+};
+```
+
+objc_class继承了objc_object，结构如下：
+
+isa：objc_object 指向类，objc_class 指向元类。
+
+superclass：指向父类。
+
+cache：存储用户消息转发优化的方法缓存和 vtable 。
+
+bits：class_rw_t 和 class_ro_t ，保存了方法、协议、属性等列表和一些标志位。
+
+__总结：__ 类也是对象，类对象有且只有一个。类对象本质为objc_class结构体。类对象里面存储了类的父 类、属性、实例方法、协议、成员变量、方法缓存等等。
+
+### isa
+
+isa 是一个 Class 类型的指针。每个实例对象有个isa的指针,他指向对象的类，而Class里也有个isa的指针, 指向metaClass(元类)。元类保存了类方法的列表。当类方法被调用时，先会从本身查找类方法的实现，如果没有，元类会向他父类查找该方法。同时注意的是：元类（metaClass）也是类，它也是对象。元类也有isa指针,它的isa指针最终指向的是一个根元类（NSObject metaClass）。根元类的isa指针指向本身，这样形成了一个封闭的内循环。
+
+元类设计是为了复用一套消息发送机制（objc_msgSend(id self, SEL)）（消息接受者，方法名），符合单一职责的设计原则。如果没有元类，需要objc_msgSend增加参数区分类方法和实例方法，影响消息发送效率。
+
+### class_rw_t 和 class_ro_t
+
+class_rw_t是结构体类型，提供了获取属性列表，方法列表，协议列表的方法。
+
+class_ro_t是结构体类型，有一个ivar_list_t * ivars变量。
+
+ro属于clean memory，在编译时即确定的内存空间，只读，加载后不会发生改变的内存空间，包括类名称、方法、协议和实例变量的信息；
+
+rw的数据空间属于dirty memory，rw是运行时的结构，可读可写，由于其动态性，可以往类中添加属性、方法、协议。在运行时会发生变更的内存。
+
+rw数据什么时候初始化呢？—— realizeClassWithoutSwift，类初始化的时候！在类初始化流程中，从macho中获取的数据data()，强制装换为class_ro_t，同时初始化class_rw_t的空间，并复制一份ro的数据放入rw中。
+
+class_rw_ext_t可以减少内存的消耗。苹果在wwdc2020里面说过，只有大约10%左右的类需要动 态修改。所以只有10%左右的类里面需要生成class_rw_ext_t这个结构体。这样的话，可以节约很大一部分内存。
+
+class_rw_ext_t生成的条件：用过runtime的Api进行动态修改的时候；有分类的时候，且分类和本类都为非懒加载类的时候。实现了+load方法即为非懒加载类。
