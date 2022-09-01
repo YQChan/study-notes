@@ -549,7 +549,7 @@ _objc_rootInit(<span class="hljs-keyword">id</span> obj)
 }
 </code></pre>
 <p>init &#x65B9;&#x6CD5;&#x53EA;&#x662F;&#x8FD4;&#x56DE;&#x4E86;&#x5F53;&#x524D;&#x5BF9;&#x8C61;&#x3002;init &#x65B9;&#x5F0F;&#x7684;&#x8BBE;&#x8BA1;&#x76F8;&#x5F53;&#x4E8E;&#x4E00;&#x79CD;&#x5DE5;&#x5382;&#x6A21;&#x5F0F;&#xFF0C;&#x5728;&#x5B50;&#x7C7B;&#x91CD;&#x5199;&#x8BE5;&#x65B9;&#x6CD5;&#xFF0C;&#x8FDB;&#x884C;&#x5982;&#x4E00;&#x4E9B;&#x53D8;&#x91CF;&#x521D;&#x59CB;&#x5316;&#x8D4B;&#x503C;&#x3002;</p>
-<h2 id="&#x5BF9;&#x8C61;&#x672C;&#x8D28;">&#x5BF9;&#x8C61;&#x672C;&#x8D28;</h2>
+<h2 id="&#x5BF9;&#x8C61;&#x7684;&#x7ED3;&#x6784;">&#x5BF9;&#x8C61;&#x7684;&#x7ED3;&#x6784;</h2>
 <p>&#x6253;&#x5F00;&#x7EC8;&#x7AEF;&#xFF0C;cd &#x8FDB;&#x5165; main.m &#x6587;&#x4EF6;&#x6240;&#x5728;&#x8DEF;&#x5F84;&#xFF0C;&#x4F7F;&#x7528; clang &#x628A;&#x6587;&#x4EF6;&#x7F16;&#x8BD1;&#x6210; cpp &#x6587;&#x4EF6;&#x3002;</p>
 <pre><code class="lang-shell">clang -rewrite-objc main.cpp
 </code></pre>
@@ -571,6 +571,7 @@ _objc_rootInit(<span class="hljs-keyword">id</span> obj)
 };
 </code></pre>
 <p>&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;Person &#x5BF9;&#x8C61;&#x672C;&#x8D28;&#x90FD;&#x662F;&#x4E00;&#x4E2A; objc_object &#x7684;&#x7ED3;&#x6784;&#x4F53;&#xFF0C;Person_IMPL &#x91CC;&#x9762;&#x6709; NSObject_IMPL &#x548C;&#x6210;&#x5458;&#x53D8;&#x91CF;&#x7684;&#x503C;&#xFF0C;NSObject_IMPL &#x5305;&#x542B;&#x4E86;&#x4E00;&#x4E2A; Class &#x7C7B;&#x578B;&#x7684; isa &#x6307;&#x9488;&#x3002;</p>
+<p>&#x5BF9;&#x8C61;&#x91CC;&#x9762;&#x5B58;&#x50A8;&#x4E86;&#x4E00;&#x4E2A;isa&#x6307;&#x9488; + &#x6210;&#x5458;&#x53D8;&#x91CF;&#x7684;&#x503C;&#xFF0C;isa&#x6307;&#x9488;&#x662F;&#x56FA;&#x5B9A;&#x7684;&#xFF0C;&#x5360;8&#x4E2A;&#x5B57;&#x8282;&#xFF0C;&#x6240;&#x4EE5;&#x5F71;&#x54CD;&#x5BF9;&#x8C61;&#x5185;&#x5B58;&#x7684;&#x53EA;&#x6709;&#x6210;&#x5458;&#x53D8;&#x91CF;&#xFF08;&#x5C5E;&#x6027;&#x4F1A;&#x81EA;&#x52A8;&#x751F;&#x6210;&#x5E26;&#x4E0B;&#x5212;&#x7EBF;&#x7684;&#x6210;&#x5458;&#x53D8;&#x91CF;&#xFF09;&#x3002;</p>
 <h3 id="isa-&#x7ED3;&#x6784;">isa &#x7ED3;&#x6784;</h3>
 <p>&#x67E5;&#x770B;&#x6E90;&#x7801;&#x627E;&#x5230; isa</p>
 <pre><code class="lang-objc"><span class="hljs-keyword">union</span> isa_t {
@@ -613,6 +614,71 @@ public:
     Class getDecodedClass(<span class="hljs-keyword">bool</span> authenticated);
 }
 </code></pre>
+<p>&#x53EF;&#x4EE5;&#x770B;&#x5230; isa &#x672C;&#x8D28;&#x662F;&#x4E00;&#x4E2A;8&#x5B57;&#x8282;&#x8054;&#x5408;&#x4F53;&#xFF0C;&#x800C;&#x4E14;&#x4F7F;&#x7528;&#x4E86;&#x4F4D;&#x57DF;&#x4F18;&#x5316;&#x5185;&#x5B58;&#x5206;&#x914D;&#xFF0C;&#x91CC;&#x9762;&#x5B58;&#x653E;&#x4E86;&#x7C7B;&#x5BF9;&#x8C61;&#x7684;&#x6307;&#x9488;&#x3002;nonPointerIsa&#x662F;&#x5185;&#x5B58;&#x4F18;&#x5316;&#x7684;&#x4E00;&#x79CD;&#x624B;&#x6BB5;&#x3002;isa&#x662F;&#x4E00;&#x4E2A;Class&#x7C7B;&#x578B;&#x7684;&#x7ED3;&#x6784;&#x4F53;&#x6307;&#x9488;&#xFF0C;&#x5360;8&#x4E2A;&#x5B57;&#x8282;&#xFF0C;&#x4E3B;&#x8981;&#x662F;&#x7528; &#x6765;&#x5B58;&#x5185;&#x5B58;&#x5730;&#x5740;&#x7684;&#x3002;&#x4F46;&#x662F;8&#x4E2A;&#x5B57;&#x8282;&#x610F;&#x5473;&#x7740;&#x5B83;&#x5C31;&#x6709;8*8=64&#x4F4D;&#x3002;&#x5B58;&#x50A8;&#x5730;&#x5740;&#x6839;&#x672C;&#x4E0D;&#x9700;&#x8981;&#x8FD9;&#x4E48;&#x591A;&#x7684;&#x5185;&#x5B58;&#x7A7A;&#x95F4;&#x3002;&#x800C;&#x4E14;&#x6BCF;&#x4E2A;&#x5BF9;&#x8C61;&#x90FD;&#x6709;&#x4E2A;isa&#x6307;&#x9488;&#xFF0C;&#x8FD9;&#x6837;&#x5C31;&#x6D6A;&#x8D39;&#x4E86;&#x5185;&#x5B58;&#x3002;&#x6240;&#x4EE5;&#x82F9;&#x679C;&#x5C31;&#x628A;&#x548C;&#x5BF9;&#x8C61;&#x4E00;&#x4E9B;&#x606F;&#x606F;&#x76F8;&#x5173;&#x7684;&#x4E1C;&#x2EC4;&#xFF0C;&#x5B58;&#x5728;&#x4E86;&#x8FD9;&#x5757;&#x5185;&#x5B58;&#x7A7A;&#x95F4;&#x91CC;&#x9762;&#x3002;&#x8FD9;&#x79CD;isa&#x6307;&#x9488;&#x5C31;&#x53EB;nonPointerIsa&#x3002;</p>
+<h2 id="&#x7C7B;&#x7684;&#x7ED3;&#x6784;">&#x7C7B;&#x7684;&#x7ED3;&#x6784;</h2>
+<pre><code class="lang-objc"><span class="hljs-keyword">typedef</span> <span class="hljs-keyword">struct</span> objc_class *Class;
+
+<span class="hljs-keyword">struct</span> objc_class : objc_object {
+    <span class="hljs-comment">// Class ISA;</span>
+    Class superclass;
+    cache_t cache;             <span class="hljs-comment">// formerly cache pointer and vtable</span>
+    class_data_bits_t bits;    <span class="hljs-comment">// class_rw_t * plus custom rr/alloc flags</span>
+};
+
+<span class="hljs-keyword">struct</span> class_data_bits_t {
+
+    <span class="hljs-comment">// ...&#x7701;&#x7565;</span>
+public:
+    class_rw_t* data() {
+        <span class="hljs-keyword">return</span> (class_rw_t *)(bits &amp; FAST_DATA_MASK);
+    }
+    <span class="hljs-comment">// ...&#x7701;&#x7565;</span>
+}
+
+<span class="hljs-keyword">struct</span> class_rw_t {
+    uint32_t flags;
+    uint32_t version;
+
+    <span class="hljs-keyword">const</span> class_ro_t *ro;
+    <span class="hljs-comment">// ...&#x7701;&#x7565;</span>
+}
+
+<span class="hljs-keyword">struct</span> class_ro_t {
+    uint32_t flags;
+    uint32_t instanceStart;
+    uint32_t instanceSize;
+<span class="hljs-meta">#ifdef __LP64__</span>
+    uint32_t reserved;
+<span class="hljs-meta">#endif</span>
+
+    <span class="hljs-keyword">const</span> uint8_t * ivarLayout;
+
+    <span class="hljs-keyword">const</span> <span class="hljs-keyword">char</span> * name;
+    <span class="hljs-keyword">const</span> method_list_t * baseMethods;
+    <span class="hljs-keyword">const</span> protocol_list_t * baseProtocols;
+    <span class="hljs-keyword">const</span> ivar_list_t * ivars;
+
+    <span class="hljs-keyword">const</span> uint8_t * weakIvarLayout;
+    <span class="hljs-keyword">const</span> property_list_t *baseProperties;
+};
+</code></pre>
+<p>objc_class&#x7EE7;&#x627F;&#x4E86;objc_object&#xFF0C;&#x7ED3;&#x6784;&#x5982;&#x4E0B;&#xFF1A;</p>
+<p>isa&#xFF1A;objc_object &#x6307;&#x5411;&#x7C7B;&#xFF0C;objc_class &#x6307;&#x5411;&#x5143;&#x7C7B;&#x3002;</p>
+<p>superclass&#xFF1A;&#x6307;&#x5411;&#x7236;&#x7C7B;&#x3002;</p>
+<p>cache&#xFF1A;&#x5B58;&#x50A8;&#x7528;&#x6237;&#x6D88;&#x606F;&#x8F6C;&#x53D1;&#x4F18;&#x5316;&#x7684;&#x65B9;&#x6CD5;&#x7F13;&#x5B58;&#x548C; vtable &#x3002;</p>
+<p>bits&#xFF1A;class_rw_t &#x548C; class_ro_t &#xFF0C;&#x4FDD;&#x5B58;&#x4E86;&#x65B9;&#x6CD5;&#x3001;&#x534F;&#x8BAE;&#x3001;&#x5C5E;&#x6027;&#x7B49;&#x5217;&#x8868;&#x548C;&#x4E00;&#x4E9B;&#x6807;&#x5FD7;&#x4F4D;&#x3002;</p>
+<p><strong>&#x603B;&#x7ED3;&#xFF1A;</strong> &#x7C7B;&#x4E5F;&#x662F;&#x5BF9;&#x8C61;&#xFF0C;&#x7C7B;&#x5BF9;&#x8C61;&#x6709;&#x4E14;&#x53EA;&#x6709;&#x4E00;&#x4E2A;&#x3002;&#x7C7B;&#x5BF9;&#x8C61;&#x672C;&#x8D28;&#x4E3A;objc_class&#x7ED3;&#x6784;&#x4F53;&#x3002;&#x7C7B;&#x5BF9;&#x8C61;&#x91CC;&#x9762;&#x5B58;&#x50A8;&#x4E86;&#x7C7B;&#x7684;&#x7236; &#x7C7B;&#x3001;&#x5C5E;&#x6027;&#x3001;&#x5B9E;&#x4F8B;&#x65B9;&#x6CD5;&#x3001;&#x534F;&#x8BAE;&#x3001;&#x6210;&#x5458;&#x53D8;&#x91CF;&#x3001;&#x65B9;&#x6CD5;&#x7F13;&#x5B58;&#x7B49;&#x7B49;&#x3002;</p>
+<h3 id="isa">isa</h3>
+<p>isa &#x662F;&#x4E00;&#x4E2A; Class &#x7C7B;&#x578B;&#x7684;&#x6307;&#x9488;&#x3002;&#x6BCF;&#x4E2A;&#x5B9E;&#x4F8B;&#x5BF9;&#x8C61;&#x6709;&#x4E2A;isa&#x7684;&#x6307;&#x9488;,&#x4ED6;&#x6307;&#x5411;&#x5BF9;&#x8C61;&#x7684;&#x7C7B;&#xFF0C;&#x800C;Class&#x91CC;&#x4E5F;&#x6709;&#x4E2A;isa&#x7684;&#x6307;&#x9488;, &#x6307;&#x5411;metaClass(&#x5143;&#x7C7B;)&#x3002;&#x5143;&#x7C7B;&#x4FDD;&#x5B58;&#x4E86;&#x7C7B;&#x65B9;&#x6CD5;&#x7684;&#x5217;&#x8868;&#x3002;&#x5F53;&#x7C7B;&#x65B9;&#x6CD5;&#x88AB;&#x8C03;&#x7528;&#x65F6;&#xFF0C;&#x5148;&#x4F1A;&#x4ECE;&#x672C;&#x8EAB;&#x67E5;&#x627E;&#x7C7B;&#x65B9;&#x6CD5;&#x7684;&#x5B9E;&#x73B0;&#xFF0C;&#x5982;&#x679C;&#x6CA1;&#x6709;&#xFF0C;&#x5143;&#x7C7B;&#x4F1A;&#x5411;&#x4ED6;&#x7236;&#x7C7B;&#x67E5;&#x627E;&#x8BE5;&#x65B9;&#x6CD5;&#x3002;&#x540C;&#x65F6;&#x6CE8;&#x610F;&#x7684;&#x662F;&#xFF1A;&#x5143;&#x7C7B;&#xFF08;metaClass&#xFF09;&#x4E5F;&#x662F;&#x7C7B;&#xFF0C;&#x5B83;&#x4E5F;&#x662F;&#x5BF9;&#x8C61;&#x3002;&#x5143;&#x7C7B;&#x4E5F;&#x6709;isa&#x6307;&#x9488;,&#x5B83;&#x7684;isa&#x6307;&#x9488;&#x6700;&#x7EC8;&#x6307;&#x5411;&#x7684;&#x662F;&#x4E00;&#x4E2A;&#x6839;&#x5143;&#x7C7B;&#xFF08;NSObject metaClass&#xFF09;&#x3002;&#x6839;&#x5143;&#x7C7B;&#x7684;isa&#x6307;&#x9488;&#x6307;&#x5411;&#x672C;&#x8EAB;&#xFF0C;&#x8FD9;&#x6837;&#x5F62;&#x6210;&#x4E86;&#x4E00;&#x4E2A;&#x5C01;&#x95ED;&#x7684;&#x5185;&#x5FAA;&#x73AF;&#x3002;</p>
+<p>&#x5143;&#x7C7B;&#x8BBE;&#x8BA1;&#x662F;&#x4E3A;&#x4E86;&#x590D;&#x7528;&#x4E00;&#x5957;&#x6D88;&#x606F;&#x53D1;&#x9001;&#x673A;&#x5236;&#xFF08;objc_msgSend(id self, SEL)&#xFF09;&#xFF08;&#x6D88;&#x606F;&#x63A5;&#x53D7;&#x8005;&#xFF0C;&#x65B9;&#x6CD5;&#x540D;&#xFF09;&#xFF0C;&#x7B26;&#x5408;&#x5355;&#x4E00;&#x804C;&#x8D23;&#x7684;&#x8BBE;&#x8BA1;&#x539F;&#x5219;&#x3002;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x5143;&#x7C7B;&#xFF0C;&#x9700;&#x8981;objc_msgSend&#x589E;&#x52A0;&#x53C2;&#x6570;&#x533A;&#x5206;&#x7C7B;&#x65B9;&#x6CD5;&#x548C;&#x5B9E;&#x4F8B;&#x65B9;&#x6CD5;&#xFF0C;&#x5F71;&#x54CD;&#x6D88;&#x606F;&#x53D1;&#x9001;&#x6548;&#x7387;&#x3002;</p>
+<h3 id="classrwt-&#x548C;-classrot">class_rw_t &#x548C; class_ro_t</h3>
+<p>class_rw_t&#x662F;&#x7ED3;&#x6784;&#x4F53;&#x7C7B;&#x578B;&#xFF0C;&#x63D0;&#x4F9B;&#x4E86;&#x83B7;&#x53D6;&#x5C5E;&#x6027;&#x5217;&#x8868;&#xFF0C;&#x65B9;&#x6CD5;&#x5217;&#x8868;&#xFF0C;&#x534F;&#x8BAE;&#x5217;&#x8868;&#x7684;&#x65B9;&#x6CD5;&#x3002;</p>
+<p>class_ro_t&#x662F;&#x7ED3;&#x6784;&#x4F53;&#x7C7B;&#x578B;&#xFF0C;&#x6709;&#x4E00;&#x4E2A;ivar_list_t * ivars&#x53D8;&#x91CF;&#x3002;</p>
+<p>ro&#x5C5E;&#x4E8E;clean memory&#xFF0C;&#x5728;&#x7F16;&#x8BD1;&#x65F6;&#x5373;&#x786E;&#x5B9A;&#x7684;&#x5185;&#x5B58;&#x7A7A;&#x95F4;&#xFF0C;&#x53EA;&#x8BFB;&#xFF0C;&#x52A0;&#x8F7D;&#x540E;&#x4E0D;&#x4F1A;&#x53D1;&#x751F;&#x6539;&#x53D8;&#x7684;&#x5185;&#x5B58;&#x7A7A;&#x95F4;&#xFF0C;&#x5305;&#x62EC;&#x7C7B;&#x540D;&#x79F0;&#x3001;&#x65B9;&#x6CD5;&#x3001;&#x534F;&#x8BAE;&#x548C;&#x5B9E;&#x4F8B;&#x53D8;&#x91CF;&#x7684;&#x4FE1;&#x606F;&#xFF1B;</p>
+<p>rw&#x7684;&#x6570;&#x636E;&#x7A7A;&#x95F4;&#x5C5E;&#x4E8E;dirty memory&#xFF0C;rw&#x662F;&#x8FD0;&#x884C;&#x65F6;&#x7684;&#x7ED3;&#x6784;&#xFF0C;&#x53EF;&#x8BFB;&#x53EF;&#x5199;&#xFF0C;&#x7531;&#x4E8E;&#x5176;&#x52A8;&#x6001;&#x6027;&#xFF0C;&#x53EF;&#x4EE5;&#x5F80;&#x7C7B;&#x4E2D;&#x6DFB;&#x52A0;&#x5C5E;&#x6027;&#x3001;&#x65B9;&#x6CD5;&#x3001;&#x534F;&#x8BAE;&#x3002;&#x5728;&#x8FD0;&#x884C;&#x65F6;&#x4F1A;&#x53D1;&#x751F;&#x53D8;&#x66F4;&#x7684;&#x5185;&#x5B58;&#x3002;</p>
+<p>rw&#x6570;&#x636E;&#x4EC0;&#x4E48;&#x65F6;&#x5019;&#x521D;&#x59CB;&#x5316;&#x5462;&#xFF1F;&#x2014;&#x2014; realizeClassWithoutSwift&#xFF0C;&#x7C7B;&#x521D;&#x59CB;&#x5316;&#x7684;&#x65F6;&#x5019;&#xFF01;&#x5728;&#x7C7B;&#x521D;&#x59CB;&#x5316;&#x6D41;&#x7A0B;&#x4E2D;&#xFF0C;&#x4ECE;macho&#x4E2D;&#x83B7;&#x53D6;&#x7684;&#x6570;&#x636E;data()&#xFF0C;&#x5F3A;&#x5236;&#x88C5;&#x6362;&#x4E3A;class_ro_t&#xFF0C;&#x540C;&#x65F6;&#x521D;&#x59CB;&#x5316;class_rw_t&#x7684;&#x7A7A;&#x95F4;&#xFF0C;&#x5E76;&#x590D;&#x5236;&#x4E00;&#x4EFD;ro&#x7684;&#x6570;&#x636E;&#x653E;&#x5165;rw&#x4E2D;&#x3002;</p>
+<p>class_rw_ext_t&#x53EF;&#x4EE5;&#x51CF;&#x5C11;&#x5185;&#x5B58;&#x7684;&#x6D88;&#x8017;&#x3002;&#x82F9;&#x679C;&#x5728;wwdc2020&#x91CC;&#x9762;&#x8BF4;&#x8FC7;&#xFF0C;&#x53EA;&#x6709;&#x5927;&#x7EA6;10%&#x5DE6;&#x53F3;&#x7684;&#x7C7B;&#x9700;&#x8981;&#x52A8; &#x6001;&#x4FEE;&#x6539;&#x3002;&#x6240;&#x4EE5;&#x53EA;&#x6709;10%&#x5DE6;&#x53F3;&#x7684;&#x7C7B;&#x91CC;&#x9762;&#x9700;&#x8981;&#x751F;&#x6210;class_rw_ext_t&#x8FD9;&#x4E2A;&#x7ED3;&#x6784;&#x4F53;&#x3002;&#x8FD9;&#x6837;&#x7684;&#x8BDD;&#xFF0C;&#x53EF;&#x4EE5;&#x8282;&#x7EA6;&#x5F88;&#x5927;&#x4E00;&#x90E8;&#x5206;&#x5185;&#x5B58;&#x3002;</p>
+<p>class_rw_ext_t&#x751F;&#x6210;&#x7684;&#x6761;&#x4EF6;&#xFF1A;&#x7528;&#x8FC7;runtime&#x7684;Api&#x8FDB;&#x884C;&#x52A8;&#x6001;&#x4FEE;&#x6539;&#x7684;&#x65F6;&#x5019;&#xFF1B;&#x6709;&#x5206;&#x7C7B;&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x4E14;&#x5206;&#x7C7B;&#x548C;&#x672C;&#x7C7B;&#x90FD;&#x4E3A;&#x975E;&#x61D2;&#x52A0;&#x8F7D;&#x7C7B;&#x7684;&#x65F6;&#x5019;&#x3002;&#x5B9E;&#x73B0;&#x4E86;+load&#x65B9;&#x6CD5;&#x5373;&#x4E3A;&#x975E;&#x61D2;&#x52A0;&#x8F7D;&#x7C7B;&#x3002;</p>
 
                                 
                                 </section>
@@ -656,7 +722,7 @@ public:
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"类与对象","level":"1.2.1.1","depth":3,"next":{"title":"属性","level":"1.2.1.2","depth":3,"path":"iOS/Objective-C/property.md","ref":"iOS/Objective-C/property.md","articles":[]},"previous":{"title":"Objective-C","level":"1.2.1","depth":2,"path":"iOS/Objective-C/README.md","ref":"iOS/Objective-C/README.md","articles":[{"title":"类与对象","level":"1.2.1.1","depth":3,"path":"iOS/Objective-C/class.md","ref":"iOS/Objective-C/class.md","articles":[]},{"title":"属性","level":"1.2.1.2","depth":3,"path":"iOS/Objective-C/property.md","ref":"iOS/Objective-C/property.md","articles":[]},{"title":"消息发送与转发","level":"1.2.1.3","depth":3,"path":"iOS/Objective-C/method.md","ref":"iOS/Objective-C/method.md","articles":[]},{"title":"关联对象","level":"1.2.1.4","depth":3,"path":"iOS/Objective-C/associationObject.md","ref":"iOS/Objective-C/associationObject.md","articles":[]},{"title":"分类与扩展","level":"1.2.1.5","depth":3,"path":"iOS/Objective-C/category.md","ref":"iOS/Objective-C/category.md","articles":[]},{"title":"KVO","level":"1.2.1.6","depth":3,"path":"iOS/Objective-C/KVO.md","ref":"iOS/Objective-C/KVO.md","articles":[]},{"title":"Block","level":"1.2.1.7","depth":3,"path":"iOS/Objective-C/Block.md","ref":"iOS/Objective-C/Block.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":[],"pluginsConfig":{"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"iOS/Objective-C/class.md","mtime":"2022-08-05T13:59:54.637Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2022-08-05T14:00:48.308Z"},"basePath":"../..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"类与对象","level":"1.2.1.1","depth":3,"next":{"title":"属性","level":"1.2.1.2","depth":3,"path":"iOS/Objective-C/property.md","ref":"iOS/Objective-C/property.md","articles":[]},"previous":{"title":"Objective-C","level":"1.2.1","depth":2,"path":"iOS/Objective-C/README.md","ref":"iOS/Objective-C/README.md","articles":[{"title":"类与对象","level":"1.2.1.1","depth":3,"path":"iOS/Objective-C/class.md","ref":"iOS/Objective-C/class.md","articles":[]},{"title":"属性","level":"1.2.1.2","depth":3,"path":"iOS/Objective-C/property.md","ref":"iOS/Objective-C/property.md","articles":[]},{"title":"消息发送与转发","level":"1.2.1.3","depth":3,"path":"iOS/Objective-C/method.md","ref":"iOS/Objective-C/method.md","articles":[]},{"title":"关联对象","level":"1.2.1.4","depth":3,"path":"iOS/Objective-C/associationObject.md","ref":"iOS/Objective-C/associationObject.md","articles":[]},{"title":"分类与扩展","level":"1.2.1.5","depth":3,"path":"iOS/Objective-C/category.md","ref":"iOS/Objective-C/category.md","articles":[]},{"title":"KVO","level":"1.2.1.6","depth":3,"path":"iOS/Objective-C/KVO.md","ref":"iOS/Objective-C/KVO.md","articles":[]},{"title":"Block","level":"1.2.1.7","depth":3,"path":"iOS/Objective-C/Block.md","ref":"iOS/Objective-C/Block.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["livereload"],"pluginsConfig":{"livereload":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"iOS/Objective-C/class.md","mtime":"2022-09-01T08:37:49.072Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2022-09-01T08:44:49.176Z"},"basePath":"../..","book":{"language":""}});
         });
     </script>
 </div>
@@ -664,6 +730,10 @@ public:
         
     <script src="../../gitbook/gitbook.js"></script>
     <script src="../../gitbook/theme.js"></script>
+    
+        
+        <script src="../../gitbook/gitbook-plugin-livereload/plugin.js"></script>
+        
     
         
         <script src="../../gitbook/gitbook-plugin-search/search-engine.js"></script>
