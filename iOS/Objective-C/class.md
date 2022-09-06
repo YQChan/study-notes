@@ -229,7 +229,7 @@ init 方法只是返回了当前对象。init 方式的设计相当于一种工�
 打开终端，cd 进入 main.m 文件所在路径，使用 clang 把文件编译成 cpp 文件。
 
 ```shell
-clang -rewrite-objc main.cpp
+clang -rewrite-objc main.m -o main.cpp
 ```
 
 打开 main.cpp 文件，并查找 Person 声明
